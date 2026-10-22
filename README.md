@@ -1,6 +1,15 @@
 Mail-in-a-Box
 =============
 
+> **DISCLAIMER: HTTPS IS NOT OPEN TO THE PUBLIC IN THIS VERSION.**
+>
+> This is a modified version 77. The setup scripts never open port 443 to the public.
+> Port 443/tcp is allowed in the firewall only from `192.168.2.0/24`, and any public rule for it is removed on each setup run.
+> The control panel (`/admin`) and every other HTTPS service are reachable only from that network.
+> Port 80 stays open for Let's Encrypt certificate validation and redirects to HTTPS.
+> The control panel service check treats HTTPS as a local service.
+> The software is provided as is, without warranty of any kind.
+
 By [@JoshData](https://github.com/JoshData) and [contributors](https://github.com/mail-in-a-box/mailinabox/graphs/contributors).
 
 Mail-in-a-Box helps individuals take back control of their email by defining a one-click, easy-to-deploy SMTP+everything else server: a mail server in a box.
