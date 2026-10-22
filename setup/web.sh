@@ -151,4 +151,10 @@ restart_service php"$PHP_VER"-fpm
 
 # Open ports.
 ufw_allow http
-ufw_allow https
+
+# HTTPS is never open to the public. Remove any public rule left by earlier
+# setups and allow only the local network.
+if [ -z "${DISABLE_FIREWALL:-}" ]; then
+	ufw delete allow 443/tcp > /dev/null 2>&1 || true
+	ufw allow from 192.168.2.0/24 to any port 443 proto tcp > /dev/null
+fi
