@@ -13,13 +13,13 @@ if [ -f /usr/sbin/apache2 ]; then
 	hide_output apt-get -y --purge autoremove
 fi
 
-# Install nginx and a PHP FastCGI daemon.
+# Install nginx.
 #
 # Turn off nginx's default website.
 
 echo "Installing Nginx (web server)..."
 
-apt_install nginx php"${PHP_VER}"-cli php"${PHP_VER}"-fpm idn2
+apt_install nginx idn2
 
 rm -f /etc/nginx/sites-enabled/default
 
@@ -44,56 +44,6 @@ sed "s#STORAGE_ROOT#$STORAGE_ROOT#" \
 tools/editconf.py /etc/nginx/nginx.conf -s \
 	server_names_hash_bucket_size="128;" \
 	ssl_protocols="TLSv1.2 TLSv1.3;"
-
-# Tell PHP not to expose its version number in the X-Powered-By header.
-tools/editconf.py /etc/php/"$PHP_VER"/fpm/php.ini -c ';' \
-	expose_php=Off
-
-# Set PHPs default charset to UTF-8, since we use it. See #367.
-tools/editconf.py /etc/php/"$PHP_VER"/fpm/php.ini -c ';' \
-        default_charset="UTF-8"
-
-# Configure the path environment for php-fpm
-tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
-	env[PATH]=/usr/local/bin:/usr/bin:/bin \
-
-# Configure php-fpm based on the amount of memory the machine has
-# This is based on the nextcloud manual for performance tuning: https://docs.nextcloud.com/server/17/admin_manual/installation/server_tuning.html
-# Some synchronisation issues can occur when many people access the site at once.
-# The pm=ondemand setting is used for memory constrained machines < 2GB, this is copied over from PR: 1216
-TOTAL_PHYSICAL_MEM=$(head -n 1 /proc/meminfo | awk '{print $2}' || /bin/true)
-if [ "$TOTAL_PHYSICAL_MEM" -lt 1000000 ]
-then
-        tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
-                pm=ondemand \
-                pm.max_children=8 \
-                pm.start_servers=2 \
-                pm.min_spare_servers=1 \
-                pm.max_spare_servers=3
-elif [ "$TOTAL_PHYSICAL_MEM" -lt 2000000 ]
-then
-        tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
-                pm=ondemand \
-                pm.max_children=16 \
-                pm.start_servers=4 \
-                pm.min_spare_servers=1 \
-                pm.max_spare_servers=6
-elif [ "$TOTAL_PHYSICAL_MEM" -lt 3000000 ]
-then
-        tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
-                pm=dynamic \
-                pm.max_children=60 \
-                pm.start_servers=6 \
-                pm.min_spare_servers=3 \
-                pm.max_spare_servers=9
-else
-        tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
-                pm=dynamic \
-                pm.max_children=120 \
-                pm.start_servers=12 \
-                pm.min_spare_servers=6 \
-                pm.max_spare_servers=18
-fi
 
 # Other nginx settings will be configured by the management service
 # since it depends on what domains we're serving, which we don't know
@@ -122,6 +72,11 @@ cat conf/mozilla-autoconfig.xml \
 	 > /var/lib/mailinabox/mozilla-autoconfig.xml
 chmod a+r /var/lib/mailinabox/mozilla-autoconfig.xml
 
+# Install the placeholder page that the nginx configuration serves for
+# the disabled PHP services.
+cp conf/service-disabled.html /var/lib/mailinabox/service-disabled.html
+chmod a+r /var/lib/mailinabox/service-disabled.html
+
 # Create a generic mta-sts.txt file which is exposed via the
 # nginx configuration at /.well-known/mta-sts.txt
 # more documentation is available on:
@@ -147,7 +102,11 @@ chown -R "$STORAGE_USER" "$STORAGE_ROOT/www"
 
 # Start services.
 restart_service nginx
-restart_service php"$PHP_VER"-fpm
+
+# PHP is not used. Stop and disable the FastCGI daemon and the Nextcloud cron
+# job left over from earlier installs.
+systemctl disable --now php"$PHP_VER"-fpm 2>/dev/null || true
+rm -f /etc/cron.d/mailinabox-nextcloud
 
 # Open ports.
 ufw_allow http

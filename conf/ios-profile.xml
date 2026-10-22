@@ -79,32 +79,6 @@
       <key>SMIMEEnabled</key>
       <false/>
     </dict>
-    <dict>
-      <key>CardDAVAccountDescription</key>
-      <string>PRIMARY_HOSTNAME contacts</string>
-      <key>CardDAVHostName</key>
-      <string>PRIMARY_HOSTNAME</string>
-      <key>CardDAVPort</key>
-      <integer>443</integer>
-      <key>CardDAVPrincipalURL</key>
-      <string>/cloud/remote.php/carddav/addressbooks/</string>
-      <key>CardDAVUseSSL</key>
-      <true/>
-      <key>PayloadDescription</key>
-      <string>PRIMARY_HOSTNAME (Mail-in-a-Box)</string>
-      <key>PayloadDisplayName</key>
-      <string>PRIMARY_HOSTNAME contacts</string>
-      <key>PayloadIdentifier</key>
-      <string>email.mailinabox.mobileconfig.PRIMARY_HOSTNAME.carddav</string>
-      <key>PayloadOrganization</key>
-      <string></string>
-      <key>PayloadType</key>
-      <string>com.apple.carddav.account</string>
-      <key>PayloadUUID</key>
-      <string>UUID3</string>
-      <key>PayloadVersion</key>
-      <integer>1</integer>
-    </dict>
   </array>
   <key>PayloadDescription</key>
   <string>PRIMARY_HOSTNAME (Mail-in-a-Box)</string>

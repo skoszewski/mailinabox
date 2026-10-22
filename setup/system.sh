@@ -110,16 +110,12 @@ hide_output add-apt-repository -y universe
 # Install the duplicity PPA.
 hide_output add-apt-repository -y ppa:duplicity-team/duplicity-release-git
 
-# Stock PHP is now 8.1, but we're transitioning through 8.0 because
-# of Nextcloud.
-hide_output add-apt-repository --y ppa:ondrej/php
-
 # ### Update Packages
 
 # Update system packages to make sure we have the latest upstream versions
 # of things from Ubuntu, as well as the directory of packages provide by the
 # PPAs so we can install those packages later.
-# --allow-releaseinfo-change is added because ppa:ondrej/php changed its Label.
+# --allow-releaseinfo-change is added because a PPA may change its Label.
 
 echo "Updating system packages..."
 hide_output apt-get update --allow-releaseinfo-change
@@ -379,8 +375,8 @@ cat conf/fail2ban/jails.conf \
 cp -f conf/fail2ban/filter.d/* /etc/fail2ban/filter.d/
 
 # On first installation, the log files that the jails look at don't all exist.
-# e.g., The roundcube error log isn't normally created until someone logs into
-# Roundcube for the first time. This causes fail2ban to fail to start. Later
+# e.g., A log file isn't normally created until the service that writes it first
+# logs something. This causes fail2ban to fail to start. Later
 # scripts will ensure the files exist and then fail2ban is given another
 # restart at the very end of setup.
 restart_service fail2ban
