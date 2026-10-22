@@ -972,12 +972,15 @@ def list_apt_updates(apt_update=True):
 
 	return pkgs
 
+VERSION_SUFFIX = "-no-https"
+
 def what_version_is_this(env):
-	# This function runs `git describe --always --abbrev=0` on the Mail-in-a-Box installation directory.
+	# This function runs `git describe --always --abbrev=0` on the Mail-in-a-Box installation directory
+	# and appends VERSION_SUFFIX, which identifies this modified version.
 	# Git may not be installed and Mail-in-a-Box may not have been cloned from github,
 	# so this function may raise all sorts of exceptions.
 	miab_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-	return shell("check_output", ["/usr/bin/git", "describe", "--always", "--abbrev=0"], env={"GIT_DIR": os.path.join(miab_dir, '.git')}).strip()
+	return shell("check_output", ["/usr/bin/git", "describe", "--always", "--abbrev=0"], env={"GIT_DIR": os.path.join(miab_dir, '.git')}).strip() + VERSION_SUFFIX
 
 def get_latest_miab_version():
 	# This pings https://mailinabox.email/setup.sh and extracts the tag named in
@@ -1002,7 +1005,7 @@ def check_miab_version(env, output):
 	else:
 		latest_ver = get_latest_miab_version()
 
-		if this_ver == latest_ver:
+		if this_ver.removesuffix(VERSION_SUFFIX) == latest_ver:
 			output.print_ok(f"Mail-in-a-Box is up to date. You are running version {this_ver}.")
 		elif latest_ver is None:
 			output.print_error(f"Latest Mail-in-a-Box version could not be determined. You are running version {this_ver}.")
