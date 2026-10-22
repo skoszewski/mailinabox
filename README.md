@@ -12,6 +12,12 @@ Mail-in-a-Box
 > PHP and the PHP-FPM service are not installed or configured by the setup scripts and the setup disables the PHP-FPM service on existing machines.
 > The disabled web paths return HTTP 503 and a placeholder page.
 > Mail delivery, IMAP, POP, SMTP submission, DNS, the control panel and static web hosting are not affected.
+>
+> Background: CVE-2026-109618 and CVE-2026-109619 ("php2shell") are critical (CVSS 9.2) PHP flaws that allow unauthenticated remote code execution through web requests.
+> The fixed PHP releases are 8.5.12, 8.4.27, 8.3.36 and 8.2.35. The upstream version of Mail-in-a-Box runs Nextcloud, Roundcube and Z-Push on PHP 8.0, which is not one of the fixed releases.
+>
+> * [CISA alert: Critical Vulnerabilities in PHP Require Immediate Patching](https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching)
+> * [Rapid7: CVE-2026-109618 and CVE-2026-109619, Critical Unauthenticated Remote Code Execution in PHP](https://www.rapid7.com/blog/post/etr-cve-2026-109618-and-cve-2026-109619-critical-unauthenticated-remote-code-execution-in-php/)
 
 By [@JoshData](https://github.com/JoshData) and [contributors](https://github.com/mail-in-a-box/mailinabox/graphs/contributors).
 
